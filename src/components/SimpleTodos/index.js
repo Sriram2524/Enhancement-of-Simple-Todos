@@ -41,7 +41,21 @@ const initialTodosList = [
 // Write your code here
 
 class SimpleTodos extends Component {
-  state = {userDetails: initialTodosList}
+  state = {inputData: '', userDetails: initialTodosList}
+
+  onChangeInput = event => {
+    this.setState({inputData: event.target.value})
+  }
+
+  onAddNewTask = () => {
+    const {inputData} = this.state
+    const uniqueID = Date.now()
+    const newArr = {id: uniqueID, title: inputData}
+    this.setState(prev => ({
+      userDetails: [...prev.userDetails, newArr],
+      inputData: '',
+    }))
+  }
 
   deleteItem = id => {
     const {userDetails} = this.state
@@ -49,18 +63,44 @@ class SimpleTodos extends Component {
     this.setState({userDetails: filterUserData})
   }
 
-  render() {
+  onEditedTast = (id, taskTitle) => {
     const {userDetails} = this.state
+    const newArray = userDetails.map(each => {
+      if (each.id === id) {
+        return {...each, title: taskTitle}
+      }
+      return each
+    })
+    this.setState({userDetails: newArray})
+  }
+
+  render() {
+    const {userDetails, inputData} = this.state
     return (
       <div className="bg-conatainer">
         <div className="card">
           <h1 className="heading">Simple Todos</h1>
+          <input
+            type="text"
+            className="input"
+            placeholder="Add Task"
+            value={inputData}
+            onChange={this.onChangeInput}
+          />
+          <button
+            type="button"
+            className="add-button"
+            onClick={this.onAddNewTask}
+          >
+            Add
+          </button>
           <ul className="unordered-list">
             {userDetails.map(eachItem => (
               <TodoItem
                 deleteItem={this.deleteItem}
                 details={eachItem}
                 key={eachItem.id}
+                onEditedTast={this.onEditedTast}
               />
             ))}
           </ul>
